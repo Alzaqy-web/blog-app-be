@@ -1,0 +1,28 @@
+import { Router } from "express";
+import { AuthController } from "./auth.controller";
+import { validateOrReject } from "class-validator";
+import { validateBody } from "../../middlewares/validation.middleware";
+import { LoginDTO } from "./dto/login.dto";
+
+export class AuthRouter {
+  router: Router;
+  authController: AuthController;
+
+  constructor() {
+    this.router = Router();
+    this.authController = new AuthController();
+    this.initialRoutes();
+  }
+
+  private initialRoutes = () => {
+    this.router.post(
+      "/login",
+      validateBody(LoginDTO),
+      this.authController.login
+    );
+  };
+
+  public getRouter = () => {
+    return this.router;
+  };
+}
