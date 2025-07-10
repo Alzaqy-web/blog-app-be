@@ -8,18 +8,18 @@ export class AuthController {
     this.authService = new AuthService();
   }
 
-  // getSamples = async (req: Request, res: Response, next: NextFunction) => {
-  //   try {
-  //     const result = await this.authService.getSamples();
-  //     res.status(200).send(result);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
-
   login = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.authService.login(req.body);
+      res.status(200).send(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  register = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await this.authService.register(req.body);
       res.status(200).send(result);
     } catch (error) {
       next(error);
