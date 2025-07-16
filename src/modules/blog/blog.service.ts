@@ -1,12 +1,18 @@
 import { Prisma } from "../../generated/prisma";
+import { ApiError } from "../../utils/api.error";
+import { generateSlug } from "../../utils/generate-slug";
+import { CloudinariService } from "../cloudinary/cloudinary.service";
 import { PrismaService } from "../prisma/prisma.service";
+import { CreateBlogDTO } from "./dto/create-blog.dto";
 import { GetBlogDTO } from "./dto/get-blog.dto";
 
 export class BlogService {
   prisma: PrismaService;
+  private cloudinaryService: CloudinariService;
 
   constructor() {
     this.prisma = new PrismaService();
+    this.cloudinaryService = new CloudinariService();
   }
   getBlogs = async (query: GetBlogDTO) => {
     const { page, take, sortBy, sortOrder, search } = query;
@@ -33,5 +39,35 @@ export class BlogService {
       data: blogs,
       meta: { page, take, total: count },
     };
+  };
+
+  createBlog = async (
+    body: CreateBlogDTO,
+    thumbnail: Express.Multer.File,
+    authUserId: number
+  ) => {
+    // cek
+    const blog = await this.prisma.blog.findFirst({
+      where: { title: body.title },
+    });
+
+    if (blog) {
+      throw new ApiError("title already in use", 400);
+    }
+
+    const slug = generateSlug(body.title);
+
+    const { secure_url } = await this.cloudinaryService.upload(thumbnail);
+
+    await this.prisma.blog.create({
+      data: {
+        ...body,
+        thumbnail: secure_url,
+        userId: authUserId,
+        slug,
+      },
+    });
+
+    return { message: "create blog susscess" };
   };
 }
