@@ -22,6 +22,7 @@ export class BlogRouter {
 
   private initialRoutes = () => {
     this.router.get("/", this.blogController.getBlogs);
+    this.router.get("/:slug", this.blogController.getBlogBySlug);
     this.router.post(
       "/",
       this.jwtMiddleware.verifyToken(JWT_SECRET!),

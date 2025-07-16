@@ -41,6 +41,19 @@ export class BlogService {
     };
   };
 
+  getBlogBySlug = async (slug: string) => {
+    const blog = await this.prisma.blog.findFirst({
+      where: { slug, deletedAt: null },
+      include: { user: { omit: { password: true } } }, //-> inculde -> join
+    });
+
+    if (!blog) {
+      throw new ApiError("blog not found", 404);
+    }
+
+    return blog;
+  };
+
   createBlog = async (
     body: CreateBlogDTO,
     thumbnail: Express.Multer.File,
