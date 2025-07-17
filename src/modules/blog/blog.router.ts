@@ -37,6 +37,11 @@ export class BlogRouter {
       validateBody(CreateBlogDTO),
       this.blogController.createBlogs
     );
+    this.router.delete(
+      "/:id",
+      this.jwtMiddleware.verifyToken(JWT_SECRET!),
+      this.blogController.deleteBlog
+    );
   };
 
   getRouter = () => {

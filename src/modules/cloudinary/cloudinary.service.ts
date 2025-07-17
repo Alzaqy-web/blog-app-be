@@ -40,6 +40,16 @@ export class CloudinariService {
     });
   };
 
-  // removce
-  remove = () => {};
+  // for delete
+  private extractPublicIdFromUrl = (url: string) => {
+    const urlParts = url.split("/");
+    const publicIdWithExtension = urlParts[urlParts.length - 1];
+    const publicId = publicIdWithExtension.split(".")[0];
+    return publicId;
+  };
+
+  remove = async (secureUrl: string) => {
+    const publicId = this.extractPublicIdFromUrl(secureUrl);
+    return await cloudinary.uploader.destroy(publicId);
+  };
 }
