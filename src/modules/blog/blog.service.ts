@@ -83,4 +83,28 @@ export class BlogService {
 
     return { message: "create blog susscess" };
   };
+
+  deteleBlog = async (id: number, authUserId: number) => {
+    const blog = await this.prisma.blog.findFirst({
+      // cari
+      where: { id, deletedAt: null },
+    });
+    // jika tidak ada
+    if (!blog) {
+      throw new ApiError("blog not found", 404);
+    }
+
+    if (blog.userId !== authUserId) {
+      throw new ApiError("unauthorized", 401);
+    }
+
+    await this.cloudinaryService.remove(blog.thumbnail);
+
+    await this.prisma.blog.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+
+    return { message: "delelte blog sucssec" };
+  };
 }
